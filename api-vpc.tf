@@ -73,3 +73,55 @@ resource "aws_route_table_association" "public_rta_az1" {
 #   subnet_id = aws_subnet.private_sn_az1.id
 #   route_table_id = aws_route_table.private_rt_az1.id
 # }
+
+# create a vpc endpoint for the execute-api
+resource "aws_vpc_endpoint" "execute_api_ep" {
+  vpc_endpoint_type = "Interface"
+  private_dns_enabled = true
+  vpc_id       = aws_vpc.api_vpc.id
+  service_name = "com.amazonaws.${var.aws_region}.execute-api"
+  security_group_ids = [aws_security_group.endpoint_sg.id]
+  subnet_ids = [aws_subnet.public_sn_az1.id]
+  tags = {
+    Name = "execute-api"
+  }
+}
+
+# create vpc endpoint policy using the aws_vpc_endpoint_policy resource for the execute-api interface endpoint 
+
+
+resource "aws_vpc_endpoint_policy" "execute_api_ep_policy" {
+  vpc_endpoint_id = aws_vpc_endpoint.execute_api_ep.id
+
+policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : "*",
+        "Action" : "*",
+        "Resource" : "*"
+      }
+    ]
+  })
+}
+# resource "aws_vpc_endpoint_policy" "execute_api_ep_policy" {
+#   vpc_endpoint_id = aws_vpc_endpoint.execute_api_ep.id
+
+# policy = jsonencode({
+#     "Version" : "2012-10-17",
+#     "Statement" : [
+#       {
+#         "Sid" : "AllowAll",
+#         "Effect" : "Allow",
+#         "Principal" : {
+#           "AWS" : "*"
+#         },
+#         "Action" : [
+#           "execute-api:Invoke"
+#         ],
+#         "Resource" : "*"
+#       }
+#     ]
+#   })
+# }

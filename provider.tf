@@ -8,9 +8,15 @@ terraform {
 }
 
 provider "aws" {
-  region = "eu-west-2"
+  region = var.aws_region
     shared_credentials_files = ["~/.aws/credentials"]
     profile = "default"
+    default_tags {
+    tags = {
+      Environment = var.tag_environment
+      Project     = var.tag_project
+    }
  
 }
   
+}
