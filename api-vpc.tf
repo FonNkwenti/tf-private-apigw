@@ -90,6 +90,23 @@ resource "aws_vpc_endpoint" "execute_api_ep" {
 # create vpc endpoint policy using the aws_vpc_endpoint_policy resource for the execute-api interface endpoint 
 
 
+# resource "aws_vpc_endpoint_policy" "execute_api_ep_policy" {
+#   vpc_endpoint_id = aws_vpc_endpoint.execute_api_ep.id
+
+# policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Action = "*"
+#         Effect   = "Allow"
+#         Resource = "*"
+#       },
+      
+#     ]
+#   })
+# }
+
+
 resource "aws_vpc_endpoint_policy" "execute_api_ep_policy" {
   vpc_endpoint_id = aws_vpc_endpoint.execute_api_ep.id
 
@@ -98,30 +115,14 @@ policy = jsonencode({
     "Statement" : [
       {
         "Effect" : "Allow",
-        "Principal" : "*",
-        "Action" : "*",
+        "Principal" : {
+          "AWS" : "*"
+        },
+        "Action" : [
+          "execute-api:Invoke"
+        ],
         "Resource" : "*"
       }
     ]
   })
 }
-# resource "aws_vpc_endpoint_policy" "execute_api_ep_policy" {
-#   vpc_endpoint_id = aws_vpc_endpoint.execute_api_ep.id
-
-# policy = jsonencode({
-#     "Version" : "2012-10-17",
-#     "Statement" : [
-#       {
-#         "Sid" : "AllowAll",
-#         "Effect" : "Allow",
-#         "Principal" : {
-#           "AWS" : "*"
-#         },
-#         "Action" : [
-#           "execute-api:Invoke"
-#         ],
-#         "Resource" : "*"
-#       }
-#     ]
-#   })
-# }

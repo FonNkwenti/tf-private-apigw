@@ -45,7 +45,6 @@ resource "aws_api_gateway_deployment" "todo_api_deployment" {
   ]
 
   rest_api_id = aws_api_gateway_rest_api.todo_api.id
-  stage_name  = "dev"
 }
 
 # create an api gateway stage for dev
@@ -66,22 +65,6 @@ resource "aws_lambda_permission" "api_gw_createTodo_permission" {
 }
 
 # create an API Gateway resource policy for the execute-api permitting only a certain VPC endpoint 
-resource "aws_api_gateway_rest_api_policy" "todo_api_policy" {
-  rest_api_id = aws_api_gateway_rest_api.todo_api.id
-  policy      = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": "*",
-      "Action": "*",
-      "Resource": "*"
-    }
-  ]
-}
-EOF
-}
 # resource "aws_api_gateway_rest_api_policy" "todo_api_policy" {
 #   rest_api_id = aws_api_gateway_rest_api.todo_api.id
 #   policy      = <<EOF
@@ -91,23 +74,40 @@ EOF
 #     {
 #       "Effect": "Allow",
 #       "Principal": "*",
-#       "Action": "execute-api:Invoke",
-#       "Resource": "arn:aws:execute-api:${var.aws_region}:${var.account_id}:${aws_api_gateway_rest_api.todo_api.id}/*"
-#     },
-#     {
-#             "Effect": "Deny",
-#             "Principal": "*",
-#             "Action": "execute-api:Invoke",
-#             "Resource": "arn:aws:execute-api:${var.aws_region}:${var.account_id}:${aws_api_gateway_rest_api.todo_api.id}/*",
-#             "Condition": {
-#                 "StringNotEquals": {
-#                     "aws:SourceVpce": "${aws_vpc_endpoint.execute_api_ep.id}"
-#                 }
-#             }
-#         }
+#       "Action": "*",
+#       "Resource": "*"
+#     }
 #   ]
 # }
 # EOF
 # }
+
+resource "aws_api_gateway_rest_api_policy" "todo_api_policy" {
+  rest_api_id = aws_api_gateway_rest_api.todo_api.id
+  policy      = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "execute-api:Invoke",
+      "Resource": "arn:aws:execute-api:${var.aws_region}:${var.account_id}:${aws_api_gateway_rest_api.todo_api.id}/*"
+    },
+    {
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "execute-api:Invoke",
+            "Resource": "arn:aws:execute-api:${var.aws_region}:${var.account_id}:${aws_api_gateway_rest_api.todo_api.id}/*",
+            "Condition": {
+                "StringNotEquals": {
+                    "aws:SourceVpce": "${aws_vpc_endpoint.execute_api_ep.id}"
+                }
+            }
+        }
+  ]
+}
+EOF
+}
 
 

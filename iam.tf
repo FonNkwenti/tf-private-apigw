@@ -60,24 +60,25 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# create vpc endpoint policy for the execute-api interface endpoint
-resource "aws_iam_policy" "vpc_endpoint_policy" {
-  name        = "vpc_endpoint_policy"
-  path        = "/"
-  description = "VPC Endpoint Policy for execute-api interface"
+# # create vpc endpoint policy for the execute-api interface endpoint
+# resource "aws_iam_policy" "vpc_endpoint_policy" {
+#   name        = "vpc_endpoint_policy"
+#   path        = "/"
+#   description = "VPC Endpoint Policy for execute-api interface"
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = [
-          "execute-api:Invoke",
-        ]
-        Effect   = "Allow"
-        Resource = "*"
-      },
-    ]
-  })
-}
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Action = [
+#           "execute-api:Invoke",
+#         ]
+#         Effect   = "Allow"
+#         Resource = "*"
+#       },
+      
+#     ]
+#   })
+# }
 
 
