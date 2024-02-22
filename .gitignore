@@ -45,3 +45,44 @@ terraform.rc
 keys/
 gcm-diagnose.log
 *.zip
+
+# Node.js
+node_modules
+.npm
+npm-debug.log
+
+# Serverless Framework
+.serverless
+
+# Build artifacts (optional)
+build/
+dist/
+
+# IDE specific files (optional)
+.vscode/
+.idea/
+
+# Environment variables (optional)
+.env*
+
+# Testing files (optional)
+coverage/
+tests/
+
+# Logs and temporary files
+*.log
+*.pid
+
+# Local stack
+.localstack/
+
+# AWS credentials and configurations
+.aws/credentials
+.aws/config
+
+# Secrets and sensitive information
+secrets.json
+# Add other sensitive files here
+
+# Personal access tokens
+.github/token
