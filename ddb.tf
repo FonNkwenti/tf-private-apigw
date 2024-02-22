@@ -1,6 +1,6 @@
 
 resource "aws_dynamodb_table" "todo" {
-  name           = "${local.ddb_table_name}"
+  name           = local.ddb_table_name
   hash_key       = "id"
   billing_mode   = "PROVISIONED"
   read_capacity  = 5

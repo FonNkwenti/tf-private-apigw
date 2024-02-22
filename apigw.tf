@@ -35,13 +35,13 @@ resource "aws_api_gateway_integration" "todo_post_lambda" {
 
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.createTodo.invoke_arn
+  uri                     = aws_lambda_function.create.invoke_arn
 }
 
 # create an api gateway deployment
 resource "aws_api_gateway_deployment" "todo_api_deployment" {
   depends_on = [
-    aws_api_gateway_integration.todo_post_lambda
+    aws_api_gateway_integration.todo_post_lambda, aws_api_gateway_rest_api_policy.todo_api_policy
   ]
 
   rest_api_id = aws_api_gateway_rest_api.todo_api.id

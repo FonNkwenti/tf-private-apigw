@@ -1,17 +1,60 @@
-// generate an archives for the lambda functions
-data "archive_file" "createTodo" {
-  type        = "zip"
-  source_file = "${path.module}/src/createTodo/handler.mjs"
-  output_path = "${path.module}/src/createTodo/handler.zip"
+###############################
+# execution role for lambdas
+###############################
+resource "aws_iam_role" "lambda_exec_role" {
+  name = "lambda-exec-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Sid    = ""
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+      }
+    ]
+  })
 }
 
-resource "aws_lambda_function" "createTodo" {
-  filename      = "${path.module}/src/createTodo/handler.zip"
-  function_name = "createTodo"
+##################################
+# Using managed IAM policies for Cloudwatch & DynamoDB
+##################################
+# see https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AWSLambdaBasicExecutionRole.html
+
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# see https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AmazonDynamoDBFullAccess.html
+resource "aws_iam_role_policy_attachment" "ddb_full_access" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+}
+
+##################################
+# Create Lambda
+##################################
+
+
+// generate an archives for the lambda functions
+data "archive_file" "create_handler_zip" {
+  type        = "zip"
+  source_dir = "${path.module}/src/handlers/"
+  # source_file = "${path.module}/src/handlers/create.mjs"
+  output_path = "${path.module}/src/handlers/create.zip"
+}
+
+resource "aws_lambda_function" "create" {
+  filename      = "${path.module}/src/handlers/create.zip"
+  function_name = var.create_function_name
+  handler       = "create.handler"
   role          = aws_iam_role.lambda_exec_role.arn
-  handler       = "handler.createTodo"
   timeout       = 30
   runtime       = "nodejs20.x"
+  source_code_hash = data.archive_file.create_handler_zip.output_base64sha256
 
   vpc_config {
     subnet_ids         = []
@@ -20,71 +63,33 @@ resource "aws_lambda_function" "createTodo" {
   logging_config {
     log_format = "Text"
   }
-
-
   #   depends_on                      = [
   #     aws_iam_role_policy_attachment.lambda_logs,
-  #     aws_cloudwatch_log_group.createTodo_lg,
+  #     aws_cloudwatch_log_group.create_lg,
   #   ]
 
   environment {
     variables = {
-      # DYNAMODB_TABLE_NAME       = aws_dynamodb_table.todo_table.name
+      DYNAMODB_TABLE_NAME = local.ddb_table_name
     }
   }
 }
 
-
-
-
-
-# create log group for createTodo function
-resource "aws_cloudwatch_log_group" "createTodo_lg" {
-  name              = "/aws/lambda/${aws_lambda_function.createTodo.function_name}"
+# create log group for create function
+resource "aws_cloudwatch_log_group" "create_lg" {
+  name              = "/aws/lambda/${aws_lambda_function.create.function_name}"
   retention_in_days = 14
 }
 
-# create IAM policy for logging from lambda 
-# resource "aws_iam_policy" "lambda_logging" {
-#   name                            = "lambda_logging"
-#   path                            = "/"
-#   description                     = "IAM policy for logging from a lambda"
 
-#   policy                          = <<EOF
-# {
-#   "Version": "2012-10-17",
-#   "Statement": [
-#     {
-#       "Action": [
-#         "logs:CreateLogGroup",
-#         "logs:CreateLogStream",
-#         "logs:PutLogEvents"
-#       ],
-#       "Resource": "arn:aws:logs:*:*:*",
-#       "Effect": "Allow"
-#     }
-#   ]
-# }
-# EOF
-# }
+resource "aws_lambda_permission" "api_gw_create_permission" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.create.function_name
+  principal     = "apigateway.amazonaws.com"
 
-
-# create IAM policy for logging from lambda using the AWS managed policy: AWSLambdaBasicExecutionRole
-# see https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AWSLambdaBasicExecutionRole.html
-
-data "aws_iam_policy" "AWSLambdaBasicExecutionRole" {
-  arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  source_arn = "${aws_api_gateway_rest_api.todo_api.execution_arn}/*"
 }
 
-resource "aws_iam_policy" "lambda_logging" {
-  name        = "lambda_logging"
-  path        = "/"
-  description = "IAM policy for logging from a lambda"
-  policy      = data.aws_iam_policy.AWSLambdaBasicExecutionRole.policy
-}
 
-# create IAM role policy attachment
-resource "aws_iam_role_policy_attachment" "lambda_logs" {
-  role       = aws_iam_role.lambda_exec_role.name
-  policy_arn = aws_iam_policy.lambda_logging.arn
-}
+
