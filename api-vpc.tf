@@ -1,50 +1,50 @@
 resource "aws_vpc" "api_vpc" {
-    cidr_block = "10.0.0.0/16"
+  cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
-  enable_dns_support = true
+  enable_dns_support   = true
   tags = {
     Name = "api-vpc"
   }
-  
+
 }
 
-resource "aws_internet_gateway" "api_vpc_igw"  {
-    vpc_id = aws_vpc.api_vpc.id
+resource "aws_internet_gateway" "api_vpc_igw" {
+  vpc_id = aws_vpc.api_vpc.id
   tags = {
     Name = "api-vpc-igw"
   }
-  
+
 }
 
 data "aws_availability_zones" "available" {}
 
 resource "aws_subnet" "public_sn_az1" {
-    vpc_id = aws_vpc.api_vpc.id
-    cidr_block = "10.0.0.0/24"
-    availability_zone = data.aws_availability_zones.available.names[0]
-    map_public_ip_on_launch = true
-    tags = {
-        Name = "public-sn-az1"
-    }
+  vpc_id                  = aws_vpc.api_vpc.id
+  cidr_block              = "10.0.0.0/24"
+  availability_zone       = data.aws_availability_zones.available.names[0]
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "public-sn-az1"
+  }
 }
-  
+
 
 resource "aws_route_table" "public_sn_rt" {
   vpc_id = aws_vpc.api_vpc.id
 
-    route {
-        cidr_block = "0.0.0.0/0"
-        gateway_id = aws_internet_gateway.api_vpc_igw.id
-    }
-        tags = {
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.api_vpc_igw.id
+  }
+  tags = {
     Name = "Public Route Table"
   }
 }
 
 resource "aws_route_table_association" "public_rta_az1" {
-  subnet_id = aws_subnet.public_sn_az1.id
+  subnet_id      = aws_subnet.public_sn_az1.id
   route_table_id = aws_route_table.public_sn_rt.id
-  
+
 }
 
 # resource "aws_subnet" "private_sn_az1" {
@@ -76,12 +76,12 @@ resource "aws_route_table_association" "public_rta_az1" {
 
 # create a vpc endpoint for the execute-api
 resource "aws_vpc_endpoint" "execute_api_ep" {
-  vpc_endpoint_type = "Interface"
+  vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
-  vpc_id       = aws_vpc.api_vpc.id
-  service_name = "com.amazonaws.${var.aws_region}.execute-api"
-  security_group_ids = [aws_security_group.endpoint_sg.id]
-  subnet_ids = [aws_subnet.public_sn_az1.id]
+  vpc_id              = aws_vpc.api_vpc.id
+  service_name        = "com.amazonaws.${var.region}.execute-api"
+  security_group_ids  = [aws_security_group.endpoint_sg.id]
+  subnet_ids          = [aws_subnet.public_sn_az1.id]
   tags = {
     Name = "execute-api"
   }
@@ -101,7 +101,7 @@ resource "aws_vpc_endpoint" "execute_api_ep" {
 #         Effect   = "Allow"
 #         Resource = "*"
 #       },
-      
+
 #     ]
 #   })
 # }
@@ -110,7 +110,7 @@ resource "aws_vpc_endpoint" "execute_api_ep" {
 resource "aws_vpc_endpoint_policy" "execute_api_ep_policy" {
   vpc_endpoint_id = aws_vpc_endpoint.execute_api_ep.id
 
-policy = jsonencode({
+  policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {

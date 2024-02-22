@@ -1,10 +1,10 @@
-variable "aws_region" {
+variable "region" {
   type    = string
-  default = "eu-central-1"
+  default = "us-east-1"
 }
 variable "account_id" {
   type    = number
-  default = 404148889442
+  default = 123456789012
 }
 
 variable "tag_environment" {
@@ -14,5 +14,13 @@ variable "tag_environment" {
 
 variable "tag_project" {
   type    = string
-  default = "tf-private-apigw"
+  default = "my-tf-project"
+}
+variable "lambda_runtime" {
+  type    = string
+  default = "nodejs20.x"
+}
+variable "lambda_timeout" {
+  type    = number
+  default = 30
 }
