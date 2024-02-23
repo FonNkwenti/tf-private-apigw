@@ -19,14 +19,15 @@ resource "aws_iam_role" "lambda_exec_role" {
 }
 
 ##################################
-# Using managed IAM policies for Cloudwatch & DynamoDB
+# Using managed IAM policies for VPC EC2 networking, Cloudwatch & DynamoDB
 ##################################
-# see https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AWSLambdaBasicExecutionRole.html
 
-resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
+# see https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AWSLambdaVPCAccessExecutionRole.html
+resource "aws_iam_role_policy_attachment" "lambda_vpc_execution" {
   role       = aws_iam_role.lambda_exec_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
+
 
 # see https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AmazonDynamoDBFullAccess.html
 resource "aws_iam_role_policy_attachment" "ddb_full_access" {
