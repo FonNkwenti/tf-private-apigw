@@ -1,17 +1,58 @@
 'use strict'
 
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
-import { ddbDocClient } from "../libs/ddbDocClient.mjs";
+import { ddbDocClient } from "./libs/ddbDocClient.mjs";
 import { randomUUID } from "crypto";
 
 const tableName = process.env.DYNAMODB_TABLE_NAME  
 
-export const handler = async (event, context) => {
-    console.log("Hello World from createTodo function");
-    console.log("event===",JSON.stringify(event, null, 2))
-    return {
-        statusCode: 200,
-        body: JSON.stringify({ message: "Hello World from createTodo function" }),
-    };
+export const handler = async (event) => {
+    console.log("Event===", JSON.stringify(event, null, 2))
+    if (event.httpMethod !=="POST") {
+        throw new Error(`Expecting POST method, received ${event.httpMethod}`);
+    }
 
+    const parsedBody = JSON.parse(event.body)
+    console.info("parsedBody==", parsedBody)
+    const {memberId, policyId, ClaimId, memberName, policyType, claimAmount, claimStatus = "pending"} = parsedBody
+    const now = new Date().toISOString()
+    const noteId = randomUUID()
+   
+
+    const params = {
+        TableName:  tableName,
+        Item: {
+            memberId, 
+            policyId, 
+            ClaimId, 
+            memberName, 
+            policyType, 
+            claimAmount, 
+            claimStatus,
+            createdAt: now,
+            updatedAt: now,
+    }
+    
+}
+console.log("params===", params)
+    let response;
+    const command = new PutCommand(params)
+    try {
+        const data = await ddbDocClient.send(command)
+        console.log("Success, note created", data)
+        response = {
+            statusCode: 201,
+            body: JSON.stringify(params.Item),
+        }
+
+            
+        } catch (err) {
+            console.log("Error", err)
+            response = {
+                statusCode: err.statusCode || 500,
+                body: JSON.stringify({err})
+            }
+        }
+    console.log("response===", response)
+    return response
 }

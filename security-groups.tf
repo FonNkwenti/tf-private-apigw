@@ -20,7 +20,7 @@ resource "aws_security_group" "ssh_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-    lifecycle {
+  lifecycle {
     create_before_destroy = true
   }
 }
@@ -37,7 +37,7 @@ resource "aws_security_group" "execute_api_ep_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     # cidr_blocks = ["${aws_subnet.private_sn_az1.cidr_block}"]
-    
+
   }
 
   egress {
@@ -48,7 +48,7 @@ resource "aws_security_group" "execute_api_ep_sg" {
   }
   # depends_on = [ aws_subnet.private_sn_az1 ]
 
-   lifecycle {
+  lifecycle {
     create_before_destroy = true
   }
 }
@@ -72,7 +72,7 @@ resource "aws_security_group" "ssm_ep_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   # depends_on = [ aws_subnet.private_sn_az1 ]
-    lifecycle {
+  lifecycle {
     create_before_destroy = true
   }
 }

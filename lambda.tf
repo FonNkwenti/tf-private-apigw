@@ -37,18 +37,16 @@ resource "aws_iam_role_policy_attachment" "ddb_full_access" {
 ##################################
 # Create Lambda
 ##################################
-
-
-// generate an archives for the lambda functions
 data "archive_file" "create_handler_zip" {
   type        = "zip"
   source_dir = "${path.module}/src/handlers/"
-  # source_file = "${path.module}/src/handlers/create.mjs"
-  output_path = "${path.module}/src/handlers/create.zip"
+  output_path = "${path.module}/src/files/create.zip"
+
 }
 
-resource "aws_lambda_function" "create" {
-  filename      = "${path.module}/src/handlers/create.zip"
+resource "aws_lambda_function" "createClaim" {
+  filename      = data.archive_file.create_handler_zip.output_path
+  # filename      = "${path.module}/src/handlers/create.zip"
   function_name = var.create_function_name
   handler       = "create.handler"
   role          = aws_iam_role.lambda_exec_role.arn
@@ -75,9 +73,10 @@ resource "aws_lambda_function" "create" {
   }
 }
 
+
 # create log group for create function
 resource "aws_cloudwatch_log_group" "create_lg" {
-  name              = "/aws/lambda/${aws_lambda_function.create.function_name}"
+  name              = "/aws/lambda/${aws_lambda_function.createClaim.function_name}"
   retention_in_days = 14
 }
 
@@ -85,11 +84,14 @@ resource "aws_cloudwatch_log_group" "create_lg" {
 resource "aws_lambda_permission" "api_gw_create_permission" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.create.function_name
+  function_name = aws_lambda_function.createClaim.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "${aws_api_gateway_rest_api.todo_api.execution_arn}/*"
+  source_arn = "${aws_api_gateway_rest_api.claims.execution_arn}/*"
 }
+
+
+
 
 
 

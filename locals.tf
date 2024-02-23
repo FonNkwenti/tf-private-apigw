@@ -1,5 +1,5 @@
 
 locals {
-  ddb_table_name = "todoTable"
+  ddb_table_name = "claimsTable"
   env            = "dev"
 }

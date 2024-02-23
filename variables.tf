@@ -24,6 +24,10 @@ variable "lambda_timeout" {
   type    = number
   default = 30
 }
+variable "create_function_name" {
+  type    = string
+  default = "createClaim"
+}
 variable "read_function_name" {
   type    = string
   default = "read"
@@ -31,10 +35,6 @@ variable "read_function_name" {
 variable "update_function_name" {
   type    = string
   default = "update"
-}
-variable "create_function_name" {
-  type    = string
-  default = "create"
 }
 variable "delete_function_name" {
   type    = string

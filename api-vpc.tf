@@ -53,7 +53,7 @@ resource "aws_route_table_association" "public_rta_az1" {
 #   tags = {
 #     Name = "EIP for AZ1"
 #   }
-  
+
 # }
 # resource "aws_nat_gateway" "natgw_az1" {
 #   subnet_id = aws_subnet.public_sn_az1.id
@@ -107,7 +107,7 @@ resource "aws_vpc_endpoint" "execute_api_ep" {
   vpc_id              = aws_vpc.api_vpc.id
   service_name        = "com.amazonaws.${var.region}.execute-api"
   security_group_ids  = [aws_security_group.execute_api_ep_sg.id]
-  subnet_ids          = [ aws_subnet.private_sn_az1.id]
+  subnet_ids          = [aws_subnet.private_sn_az1.id]
   tags = {
     Name = "execute-api-endpoint"
   }
@@ -144,7 +144,7 @@ resource "aws_vpc_endpoint" "ssm_ep" {
   vpc_id              = aws_vpc.api_vpc.id
   service_name        = "com.amazonaws.${var.region}.ssm"
   security_group_ids  = [aws_security_group.ssm_ep_sg.id]
-  subnet_ids          = [ aws_subnet.private_sn_az1.id]
+  subnet_ids          = [aws_subnet.private_sn_az1.id]
   tags = {
     Name = "ssm-endpoint"
   }
@@ -155,7 +155,7 @@ resource "aws_vpc_endpoint" "ssm_messages_ep" {
   vpc_id              = aws_vpc.api_vpc.id
   service_name        = "com.amazonaws.${var.region}.ssmmessages"
   security_group_ids  = [aws_security_group.ssm_ep_sg.id]
-  subnet_ids          = [ aws_subnet.private_sn_az1.id]
+  subnet_ids          = [aws_subnet.private_sn_az1.id]
   tags = {
     Name = "ssm-messages-endpoint"
   }
@@ -171,3 +171,13 @@ resource "aws_vpc_endpoint" "ssm_messages_ep" {
 #     Name = "ec2-messages-endpoint"
 #   }
 # }
+
+resource "aws_vpc_endpoint" "ddb_ep" {
+  service_name = "com.amazonaws.${var.region}.dynamodb"
+  vpc_id = aws_vpc.api_vpc.id
+  vpc_endpoint_type = "Gateway"
+    tags = {
+    Name = "dynamodb-gateway-endpoint"
+  }
+
+}
