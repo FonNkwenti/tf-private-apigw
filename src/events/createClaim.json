@@ -1,6 +1,6 @@
 {
-    "resource": "/notes",
-    "path": "/notes",
+    "resource": "/claim",
+    "path": "/claim",
     "httpMethod": "POST",
     "headers": {
         "Accept": "*/*",
@@ -83,18 +83,16 @@
         ]
     },
     "queryStringParameters": {
-        "userId": "abc123"
+        "policyId": "123",
+        "memberId": "123",
+        "memberName": "John Doe"
     },
-    "multiValueQueryStringParameters": {
-        "userId": [
-            "abc123"
-        ]
-    },
+    "multiValueQueryStringParameters": null,
     "pathParameters": null,
     "stageVariables": null,
     "requestContext": {
         "resourceId": "0rard4",
-        "resourcePath": "/notes",
+        "resourcePath": "/claim",
         "httpMethod": "POST",
         "extendedRequestId": "D35DTEvuyK4FYYg=",
         "requestTime": "24/Apr/2023:08:19:58 +0000",
@@ -119,10 +117,10 @@
             "userAgent": "PostmanRuntime/7.32.2",
             "user": null
         },
-        "domainName": "xyz7ug7o5f.execute-api.us-west-1.amazonaws.com",
-        "apiId": "xyz7ug7o5f"
+        "domainName": "https://4oxteev1d8.execute-api.eu-central-1.amazonaws.com/dev/claim",
+        "apiId": "4oxteev1d8"
     },
-    "body":"{\"memberID\": 123, \"policyID\": 456, \"claimID\": 789, \"memberName\": \"John Doe\", \"policyType\": \"Health\", \"claimAmount\": 500, \"claimStatus\": \"Approved\"}"
+    "body":"{\"policyType\": \"Health\", \"claimAmount\": 500, \"description\": \"snow accident\", \"status\": \"pending\"}"
     ,
     "isBase64Encoded": false
   }

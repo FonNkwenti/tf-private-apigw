@@ -88,4 +88,4 @@ secrets.json
 
 # Personal access tokens
 .github/token
-.files
+.src/files

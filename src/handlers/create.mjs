@@ -11,24 +11,22 @@ export const handler = async (event) => {
     if (event.httpMethod !=="POST") {
         throw new Error(`Expecting POST method, received ${event.httpMethod}`);
     }
+    const {memberId, policyId, memberName} = event.queryStringParameters
 
     const parsedBody = JSON.parse(event.body)
     console.info("parsedBody==", parsedBody)
-    const {memberId, policyId, ClaimId, memberName, policyType, claimAmount, claimStatus = "pending"} = parsedBody
     const now = new Date().toISOString()
-    const noteId = randomUUID()
+    const claimId = randomUUID()
    
 
     const params = {
         TableName:  tableName,
         Item: {
-            memberId, 
+            PK: `MEMBER#${memberId}`,
+            SK: `CLAIM#${claimId}`,
+            ...parsedBody,
             policyId, 
-            ClaimId, 
-            memberName, 
-            policyType, 
-            claimAmount, 
-            claimStatus,
+            memberName,
             createdAt: now,
             updatedAt: now,
     }
