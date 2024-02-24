@@ -82,8 +82,13 @@ resource "aws_route_table" "private_rt_az1" {
   #   cidr_block     = "0.0.0.0/0"
   #   nat_gateway_id = aws_nat_gateway.natgw_az1.id
   # }
+
+  route {
+    cidr_block = "172.128.0.0/16"
+    vpc_peering_connection_id = aws_vpc_peering_connection.api_client_vpc_peering.id
+  }
   tags = {
-    Name = "Private Route Table AZ1"
+    Name = "private_rt_az1"
   }
 }
 
@@ -94,6 +99,22 @@ resource "aws_route_table_association" "private_rta1_az1" {
 }
 
 
+# create a vpc peering connection
+resource "aws_vpc_peering_connection" "api_client_vpc_peering" {
+  vpc_id        = aws_vpc.api_vpc.id
+  peer_vpc_id   = aws_vpc.api_client_vpc.id
+  auto_accept   = true
+  accepter {
+    allow_remote_vpc_dns_resolution = true
+  }
+  requester {
+    allow_remote_vpc_dns_resolution = true
+  }
+  tags = {
+    Name = "api-client-vpc-peering",
+    Side = "Accepter"
+  }
+}
 
 
 ##################################
@@ -138,46 +159,49 @@ resource "aws_vpc_endpoint_policy" "execute_api_ep_policy" {
 #####################################
 # create a vpc endpoint for the SSM Manager private access
 #####################################
-resource "aws_vpc_endpoint" "ssm_ep" {
+resource "aws_vpc_endpoint" "ssm2_ep" {
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
-  vpc_id              = aws_vpc.api_vpc.id
   service_name        = "com.amazonaws.${var.region}.ssm"
-  security_group_ids  = [aws_security_group.ssm_ep_sg.id]
+
+  vpc_id              = aws_vpc.api_vpc.id
+  security_group_ids  = [aws_security_group.ssm2_ep_sg.id]
   subnet_ids          = [aws_subnet.private_sn_az1.id]
   tags = {
-    Name = "ssm-endpoint"
+    Name = "ssm2-endpoint"
   }
 }
-resource "aws_vpc_endpoint" "ssm_messages_ep" {
+resource "aws_vpc_endpoint" "ssm2_messages_ep" {
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
-  vpc_id              = aws_vpc.api_vpc.id
   service_name        = "com.amazonaws.${var.region}.ssmmessages"
-  security_group_ids  = [aws_security_group.ssm_ep_sg.id]
+
+  vpc_id              = aws_vpc.api_vpc.id
+  security_group_ids  = [aws_security_group.ssm2_ep_sg.id]
   subnet_ids          = [aws_subnet.private_sn_az1.id]
   tags = {
-    Name = "ssm-messages-endpoint"
+    Name = "ssm2-messages-endpoint"
   }
 }
-# resource "aws_vpc_endpoint" "ec2_messages_ep" {
-#   vpc_endpoint_type   = "Interface"
-#   private_dns_enabled = true
-#   vpc_id              = aws_vpc.api_vpc.id
-#   service_name        = "com.amazonaws.${var.region}.ec2messages"
-#   security_group_ids  = [aws_security_group.ssm_ep_sg.id]
-#   subnet_ids          = [ aws_subnet.private_sn_az1.id]
-#   tags = {
-#     Name = "ec2-messages-endpoint"
-#   }
-# }
+
 
 resource "aws_vpc_endpoint" "ddb_ep" {
   service_name = "com.amazonaws.${var.region}.dynamodb"
-  vpc_id = aws_vpc.api_vpc.id
   vpc_endpoint_type = "Gateway"
+  vpc_id = aws_vpc.api_vpc.id
+  route_table_ids = [aws_route_table.private_rt_az1.id]
     tags = {
     Name = "dynamodb-gateway-endpoint"
+  }
+
+}
+resource "aws_vpc_endpoint" "s3_ep" {
+  service_name = "com.amazonaws.${var.region}.s3"
+  vpc_endpoint_type = "Gateway"
+  vpc_id = aws_vpc.api_vpc.id
+  route_table_ids = [aws_route_table.private_rt_az1.id]
+    tags = {
+    Name = "s3-gateway-endpoint"
   }
 
 }

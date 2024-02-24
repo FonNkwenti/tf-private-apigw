@@ -40,3 +40,8 @@ variable "delete_function_name" {
   type    = string
   default = "delete"
 }
+
+variable "private_api_domain_name" {
+  type    = string
+  default = "api.example.com"
+}

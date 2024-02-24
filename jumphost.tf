@@ -50,15 +50,26 @@ resource "aws_instance" "jumphost" {
     Name = "jumphost"
   }
 }
-resource "aws_instance" "api_client" {
+resource "aws_instance" "api_client_1" {
   ami                    = "ami-0a23a9827c6dab833" // eu-central-1
   instance_type          = "t2.micro"
-  subnet_id              = aws_subnet.private_sn_az1.id
-  vpc_security_group_ids = [aws_security_group.ssh_sg.id, aws_security_group.execute_api_ep_sg.id, aws_security_group.ssh_sg.id]
+  subnet_id              = aws_subnet.api_client_pri_sn_az1.id
+  vpc_security_group_ids = [aws_security_group.api_client_sg.id]
   key_name               = "default-euc1"
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
   tags = {
-    Name = "api-client"
+    Name = "api-client-1"
+  }
+}
+resource "aws_instance" "api_client_2" {
+  ami                    = "ami-0a23a9827c6dab833" // eu-central-1
+  instance_type          = "t2.micro"
+  subnet_id              = aws_subnet.private_sn_az1.id
+  vpc_security_group_ids = [ aws_security_group.execute_api_ep_sg.id, aws_security_group.ssh_sg.id]
+  key_name               = "default-euc1"
+  iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
+  tags = {
+    Name = "api-client-2"
   }
 }
 
