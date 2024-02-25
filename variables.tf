@@ -41,7 +41,11 @@ variable "delete_function_name" {
   default = "delete"
 }
 
+# variable "private_api_domain_name" {
+#   type    = string
+#   default = locals.private_api_domain_name
+# }
 variable "private_api_domain_name" {
   type    = string
-  default = "api.example.com"
+  default = "execute-api.eu-central-1.amazonaws.com"
 }

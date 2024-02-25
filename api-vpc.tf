@@ -78,10 +78,6 @@ resource "aws_subnet" "private_sn_az1" {
 
 resource "aws_route_table" "private_rt_az1" {
   vpc_id = aws_vpc.api_vpc.id
-  # route {
-  #   cidr_block     = "0.0.0.0/0"
-  #   nat_gateway_id = aws_nat_gateway.natgw_az1.id
-  # }
 
   route {
     cidr_block = "172.128.0.0/16"
@@ -99,6 +95,41 @@ resource "aws_route_table_association" "private_rta1_az1" {
 }
 
 
+# create private subnet for az2
+resource "aws_subnet" "private_sn_az2" {
+  vpc_id                  = aws_vpc.api_vpc.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = data.aws_availability_zones.available.names[1]
+  map_public_ip_on_launch = false
+  tags = {
+    Name = "private-sn-az2"
+  }
+}
+
+# create route table for private subnet az2
+resource "aws_route_table" "private_rt_az2" {
+  vpc_id = aws_vpc.api_vpc.id
+
+  route {
+    cidr_block = "172.128.0.0/16"
+    vpc_peering_connection_id = aws_vpc_peering_connection.api_client_vpc_peering.id
+  }
+  tags = {
+    Name = "private_rt_az2"
+  }
+}
+
+# create route table associate for private subnet az2
+resource "aws_route_table_association" "private_rta_az2" {
+  subnet_id      = aws_subnet.private_sn_az2.id
+  route_table_id = aws_route_table.private_rt_az2.id
+}
+
+
+
+#########################################
+# VPC Peeting with client VPC
+#########################################
 # create a vpc peering connection
 resource "aws_vpc_peering_connection" "api_client_vpc_peering" {
   vpc_id        = aws_vpc.api_vpc.id
@@ -112,9 +143,33 @@ resource "aws_vpc_peering_connection" "api_client_vpc_peering" {
   }
   tags = {
     Name = "api-client-vpc-peering",
-    Side = "Accepter"
+    Side = "Requester"
   }
 }
+
+###########################################
+# DNS resolution for private api endpoint
+###########################################
+
+# create route53 inbound resolver endpoint
+resource "aws_route53_resolver_endpoint" "inbound_resolver_ep" {
+  name = "private-api-inbound-resolver-endpoint"
+  direction      = "INBOUND"
+  security_group_ids = [aws_security_group.inbound_resolver_ep_sg.id]
+  ip_address {
+    subnet_id = aws_subnet.private_sn_az1.id
+    ip = "10.0.1.10"
+  }
+  ip_address {
+    subnet_id = aws_subnet.private_sn_az2.id
+    ip = "10.0.2.10"
+  }
+  tags = {
+    Name = "private-api-inbound-resolver-endpoint"
+
+  }
+}
+
 
 
 ##################################

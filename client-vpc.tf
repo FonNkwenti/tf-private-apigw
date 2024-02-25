@@ -16,7 +16,7 @@ resource "aws_subnet" "api_client_pri_sn_az1" {
     map_public_ip_on_launch = false
 
     tags = {
-        Name = "api-client-subnet"
+        Name = "api-client-subnet-az1"
     }
   
 }
@@ -85,21 +85,7 @@ resource "aws_vpc_peering_connection_accepter" "api_client_vpc_peering" {
   }
 }
 
-resource "aws_vpc_peering_connection" "api_client_vpc_peering" {
-  vpc_id        = aws_vpc.api_client_vpc.id
-  peer_vpc_id   = aws_vpc.api_vpc.id
-  auto_accept   = true
-  accepter {
-    allow_remote_vpc_dns_resolution = true
-  }
-  requester {
-    allow_remote_vpc_dns_resolution = true
-  }
-  tags = {
-    Name = "api-client-vpc-peering",
-    Side = "Requester"
-  }
-}
+
 
 ###########################################
 # DNS resolution for private api endpoint
@@ -107,38 +93,42 @@ resource "aws_vpc_peering_connection" "api_client_vpc_peering" {
 
 # create route53 outbound resolver endpoint
 
-resource "aws_route53_resolver_endpoint" "api_client_resolver_endpoint" {
-    name      = "api-client-resolver-endpoint"
+resource "aws_route53_resolver_endpoint" "outbound_resolver_ep" {
+  name      = "private-api-outbound-resolver-endpoint"
   direction = "OUTBOUND"
-
-  security_group_ids = [aws_security_group.api_client_resolver_endpoint_sg.id]
+  security_group_ids = [aws_security_group.outbound_resolver_ep_sg.id]
 
   ip_address {
     subnet_id = aws_subnet.api_client_pri_sn_az1.id
+    ip        = "172.128.1.10"
   }
 
   ip_address {
     subnet_id = aws_subnet.api_client_pri_sn_az2.id
+    ip        = "172.128.2.10"
   }
 
   tags = {
-    Name = "api-client-resolver-endpoint"
+    Name = "private-api-resolver-endpoint"
   }
 }
 
+
 # create route53 resolver rule
-resource "aws_route53_resolver_rule" "api_client_resolver_rule" {
-  domain_name = var.api_domain_name
-  name        = "api-client-resolver-rule"
+resource "aws_route53_resolver_rule" "private_api_resolver_rule" {
+  name        = "private-api-resolver-rule"
+  domain_name = var.private_api_domain_name
   rule_type   = "FORWARD"
-  resolver_endpoint_id = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX.api_client_resolver_endpoint.id
-
-  target_ip {
-    ip = var.api_endpoint_ip
+  
+  resolver_endpoint_id = aws_route53_resolver_endpoint.outbound_resolver_ep.id
+  target_ip     {
+    ip = "10.0.1.10"
   }
-
+  target_ip     {
+    ip = "10.0.2.10"
+  }
   tags = {
-    Name = "api-client-resolver-rule"
+    Name = "private-api-resolver-rule"
   }
 }
 

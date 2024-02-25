@@ -126,7 +126,7 @@ resource "aws_security_group" "ssm_ep_sg" {
     create_before_destroy = true
   }
 }
-resource "aws_security_group" "pri_lambda_sg" {
+resource "aws_security_group" "private_lambda_sg" {
   name        = "private-lambda-sg"
   description = "Security group for private lambdas"
   vpc_id      = aws_vpc.api_vpc.id
@@ -143,6 +143,82 @@ resource "aws_security_group" "pri_lambda_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  # depends_on = [ aws_subnet.private_sn_az1 ]
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# create security group for aws_route53_resolver_endpoint
+resource "aws_security_group" "inbound_resolver_ep_sg" {
+  name        = "api-client-inbound-resolver-endpoint-sg"
+  description = "Security group for Route 53 inbound endpoints"
+  vpc_id      = aws_vpc.api_vpc.id
+
+  ingress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    # cidr_blocks = ["${aws_subnet.private_sn_az1.cidr_block}"]
+  }
+  ingress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+    # cidr_blocks = ["${aws_subnet.private_sn_az1.cidr_block}"]
+  }
+
+  egress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  # depends_on = [ aws_subnet.private_sn_az1 ]
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+resource "aws_security_group" "outbound_resolver_ep_sg" {
+  name        = "private-api-outbound-resolver-endpoint-sg"
+  description = "Security group for Route 53 outbound endpoints"
+  vpc_id      = aws_vpc.api_client_vpc.id
+
+  ingress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    # cidr_blocks = ["${aws_subnet.private_sn_az1.cidr_block}"]
+  }
+  ingress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+    # cidr_blocks = ["${aws_subnet.private_sn_az1.cidr_block}"]
+  }
+
+  egress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   # depends_on = [ aws_subnet.private_sn_az1 ]

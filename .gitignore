@@ -89,3 +89,4 @@ secrets.json
 # Personal access tokens
 .github/token
 .src/files
+.txt

@@ -1,0 +1,2 @@
+resolver endpoint troubleshooting tips https://repost.aws/knowledge-center/vpc-peering-troubleshoot-dns-resolution
+

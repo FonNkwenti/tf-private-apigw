@@ -57,7 +57,7 @@ resource "aws_lambda_function" "createClaim" {
 
   vpc_config {
     subnet_ids         = [aws_subnet.private_sn_az1.id]
-    security_group_ids = [aws_security_group.pri_lambda_sg.id]
+    security_group_ids = [aws_security_group.private_lambda_sg.id]
   }
   logging_config {
     log_format = "Text"
