@@ -43,33 +43,41 @@ resource "aws_instance" "jumphost" {
   ami                    = "ami-0a23a9827c6dab833" // eu-central-1
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_sn_az1.id
-  vpc_security_group_ids = [aws_security_group.ssh_sg.id]
+  vpc_security_group_ids = [aws_security_group.ssh_sg.id, aws_security_group.execute_api_ep_sg.id]
   key_name               = "default-euc1"
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
+  user_data_replace_on_change = true
+  user_data = base64encode(file("userdata.sh")) 
   tags = {
     Name = "jumphost"
   }
 }
-resource "aws_instance" "api_client_1" {
+resource "aws_instance" "client_vpc_instance" {
   ami                    = "ami-0a23a9827c6dab833" // eu-central-1
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.api_client_pri_sn_az1.id
-  vpc_security_group_ids = [aws_security_group.api_client_sg.id]
+  vpc_security_group_ids = [aws_security_group.api_client_sg.id, ]
   key_name               = "default-euc1"
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
+  user_data_replace_on_change = true
+  user_data = base64encode(file("userdata.sh")) 
+
   tags = {
-    Name = "api-client-1"
+    Name = "client-vpc-instance"
   }
 }
-resource "aws_instance" "api_client_2" {
+resource "aws_instance" "api_vpc_instance" {
   ami                    = "ami-0a23a9827c6dab833" // eu-central-1
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.private_sn_az1.id
   vpc_security_group_ids = [ aws_security_group.execute_api_ep_sg.id, aws_security_group.ssh_sg.id]
   key_name               = "default-euc1"
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
+  user_data_replace_on_change = true
+  user_data = base64encode(file("userdata.sh")) 
+
   tags = {
-    Name = "api-client-2"
+    Name = "api-vpc-instance"
   }
 }
 

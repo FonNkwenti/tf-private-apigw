@@ -94,6 +94,7 @@ resource "aws_vpc_peering_connection_accepter" "api_client_vpc_peering" {
 # create route53 outbound resolver endpoint
 
 resource "aws_route53_resolver_endpoint" "outbound_resolver_ep" {
+
   name      = "private-api-outbound-resolver-endpoint"
   direction = "OUTBOUND"
   security_group_ids = [aws_security_group.outbound_resolver_ep_sg.id]

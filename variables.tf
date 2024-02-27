@@ -47,5 +47,6 @@ variable "delete_function_name" {
 # }
 variable "private_api_domain_name" {
   type    = string
-  default = "execute-api.eu-central-1.amazonaws.com"
+  default = "scnejgvlzb.execute-api.eu-central-1.amazonaws.com"
+  # default = "execute-api.eu-central-1.amazonaws.com"
 }

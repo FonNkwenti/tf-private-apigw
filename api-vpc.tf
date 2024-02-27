@@ -147,6 +147,7 @@ resource "aws_vpc_peering_connection" "api_client_vpc_peering" {
   }
 }
 
+
 ###########################################
 # DNS resolution for private api endpoint
 ###########################################
