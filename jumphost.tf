@@ -1,6 +1,4 @@
-// role for EC2 ssm manager
-
-# create an IAM role for SSM 
+# role for EC2 ssm manager
 resource "aws_iam_role" "ssm_manager_role" {
   name = "ssm-manager-role"
 
@@ -37,10 +35,19 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   role = aws_iam_role.ssm_manager_role.name
 }
 
+data "aws_ami" "amazon_linux_2" {
+  most_recent = true
+  owners     = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm*"]
+  }
+}
 
 resource "aws_instance" "jumphost" {
-  # ami             = "ami-027d95b1c717e8c5d" // eu-west-1
-  ami                    = "ami-0a23a9827c6dab833" // eu-central-1
+  ami                    = data.aws_ami.amazon_linux_2.id
+  # ami                    = "ami-0a23a9827c6dab833" // eu-central-1
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public_sn_az1.id
   vpc_security_group_ids = [aws_security_group.ssh_sg.id, aws_security_group.execute_api_ep_sg.id]

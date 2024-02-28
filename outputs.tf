@@ -17,3 +17,6 @@ output "jumphost_dns" {
 output "execute_api_endpoint" {
   value = aws_vpc_endpoint.execute_api_ep.id
 }
+output "execute-api-endpoint_dns_name" {
+    value = aws_vpc_endpoint.execute_api_ep.dns_entry[0].dns_name
+}

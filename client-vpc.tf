@@ -4,7 +4,7 @@ resource "aws_vpc" "api_client_vpc" {
     enable_dns_support = true
 
     tags = {
-        Name = "api-client-vpc"
+        Name = "client-vpc"
     }
 }
 
@@ -86,12 +86,10 @@ resource "aws_vpc_peering_connection_accepter" "api_client_vpc_peering" {
 }
 
 
-
+#/*
 ###########################################
 # DNS resolution for private api endpoint
 ###########################################
-
-# create route53 outbound resolver endpoint
 
 resource "aws_route53_resolver_endpoint" "outbound_resolver_ep" {
 
@@ -123,6 +121,9 @@ resource "aws_route53_resolver_rule" "private_api_resolver_rule" {
   
   resolver_endpoint_id = aws_route53_resolver_endpoint.outbound_resolver_ep.id
   target_ip     {
+    ip = "10.0.0.2"
+  }
+  target_ip     {
     ip = "10.0.1.10"
   }
   target_ip     {
@@ -133,6 +134,12 @@ resource "aws_route53_resolver_rule" "private_api_resolver_rule" {
   }
 }
 
+# create route53 resolver rule association with client_vpc
+resource "aws_route53_resolver_rule_association" "private_api_resolver_rule_assoc" {
+  resolver_rule_id = aws_route53_resolver_rule.private_api_resolver_rule.id
+  vpc_id = aws_vpc.api_client_vpc.id
+}
+#*/
 
 
 ###########################################
@@ -160,3 +167,36 @@ resource "aws_vpc_endpoint" "ssm_messages_ep" {
     Name = "ssm-messages-endpoint"
   }
 }
+
+
+/*
+###########################################
+# private zone for private API as an alternative to using inbound and outbound Route53 resolvers
+###########################################
+resource "aws_route53_zone" "private_api_zone" {
+  name = "${aws_api_gateway_rest_api.claims.id}.execute-api.${var.region}.amazonaws.com"
+#   name = "execute-api.eu-central-1.amazonaws.com"
+  vpc {
+    vpc_id = aws_vpc.api_client_vpc.id
+  }
+
+  tags = {
+    Name = "Private API Zone"
+  }
+}
+
+resource "aws_route53_record" "api_gateway_endpoint_record" {
+  zone_id = aws_route53_zone.private_api_zone.zone_id
+  name    = ""        
+  type    = "A"
+#   records = 
+
+  alias {
+    name                   = aws_vpc_endpoint.execute_api_ep.dns_entry[0].dns_name
+    zone_id                = aws_vpc_endpoint.execute_api_ep.dns_entry[0].hosted_zone_id
+    evaluate_target_health = false   
+ 
+  }
+}
+
+*/
