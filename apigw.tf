@@ -5,7 +5,7 @@
 #create an API Gateway private REST API
 resource "aws_api_gateway_rest_api" "claims" {
   name        = "claims-api"
-  description = "Private API for claims microservice"
+  description = "Private API for claims service"
   endpoint_configuration {
     types = ["PRIVATE"]
     # types = ["REGIONAL"]

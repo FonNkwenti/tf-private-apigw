@@ -16,12 +16,12 @@ resource "aws_internet_gateway" "api_vpc_igw" {
 
 }
 
-data "aws_availability_zones" "available" {}
+# data "aws_availability_zones" "available" {}
 
 resource "aws_subnet" "public_sn_az1" {
   vpc_id                  = aws_vpc.api_vpc.id
   cidr_block              = "10.0.0.0/24"
-  availability_zone       = data.aws_availability_zones.available.names[0]
+  availability_zone       = local.az1
   map_public_ip_on_launch = true
   tags = {
     Name = "public-sn-az1"
@@ -99,7 +99,7 @@ resource "aws_route_table_association" "private_rta1_az1" {
 resource "aws_subnet" "private_sn_az2" {
   vpc_id                  = aws_vpc.api_vpc.id
   cidr_block              = "10.0.2.0/24"
-  availability_zone       = data.aws_availability_zones.available.names[1]
+  availability_zone       = local.az2
   map_public_ip_on_launch = false
   tags = {
     Name = "private-sn-az2"
@@ -128,7 +128,7 @@ resource "aws_route_table_association" "private_rta_az2" {
 
 
 #########################################
-# VPC Peeting with client VPC
+# VPC Peering with client VPC
 #########################################
 # create a vpc peering connection
 resource "aws_vpc_peering_connection" "api_client_vpc_peering" {
