@@ -109,8 +109,8 @@ resource "aws_security_group" "ssm2_ep_sg" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    # cidr_blocks = ["${aws_subnet.private_sn_az1.cidr_block}"]
+    # cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${aws_subnet.private_sn_az1.cidr_block}", aws_subnet.private_sn_az2.cidr_block]
   }
 
   egress {
@@ -119,7 +119,7 @@ resource "aws_security_group" "ssm2_ep_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  # depends_on = [ aws_subnet.private_sn_az1 ]
+ 
   lifecycle {
     create_before_destroy = true
   }

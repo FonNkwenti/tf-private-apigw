@@ -28,9 +28,9 @@ variable "create_function_name" {
   type    = string
   default = "createClaim"
 }
-variable "read_function_name" {
+variable "get_function_name" {
   type    = string
-  default = "read"
+  default = "get"
 }
 variable "update_function_name" {
   type    = string
@@ -41,12 +41,7 @@ variable "delete_function_name" {
   default = "delete"
 }
 
-# variable "private_api_domain_name" {
-#   type    = string
-#   default = locals.private_api_domain_name
-# }
 variable "private_api_domain_name" {
   type    = string
   default = "execute-api.eu-central-1.amazonaws.com"
-  # default = "execute-api.eu-central-1.amazonaws.com"
 }

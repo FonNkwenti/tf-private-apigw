@@ -7,7 +7,7 @@ import { randomUUID } from "crypto";
 const tableName = process.env.DYNAMODB_TABLE_NAME  
 
 export const handler = async (event, context) => {
-    console.log("Hello World from UpdateClaim function");
+    console.log("Hello World from updateClaim function");
     console.log("event===",JSON.stringify(event, null, 2))
     return {
         statusCode: 200,

@@ -47,24 +47,6 @@ resource "aws_route_table_association" "public_rta_az1" {
 
 }
 
-# resource "aws_eip" "az1_eip_1" {
-#   domain = "vpc"
-
-#   tags = {
-#     Name = "EIP for AZ1"
-#   }
-
-# }
-# resource "aws_nat_gateway" "natgw_az1" {
-#   subnet_id = aws_subnet.public_sn_az1.id
-#   connectivity_type = "public"
-#   allocation_id = aws_eip.az1_eip_1.id
-
-#   tags = {
-#     Name = "natgw-az1"
-#   }
-#   depends_on = [aws_internet_gateway.api_vpc_igw]
-# }
 
 resource "aws_subnet" "private_sn_az1" {
   vpc_id                  = aws_vpc.api_vpc.id
@@ -212,6 +194,7 @@ resource "aws_vpc_endpoint_policy" "execute_api_ep_policy" {
   })
 }
 
+
 #####################################
 # create a vpc endpoint for the SSM Manager private access
 #####################################
@@ -248,16 +231,6 @@ resource "aws_vpc_endpoint" "ddb_ep" {
   route_table_ids = [aws_route_table.private_rt_az1.id]
     tags = {
     Name = "dynamodb-gateway-endpoint"
-  }
-
-}
-resource "aws_vpc_endpoint" "s3_ep" {
-  service_name = "com.amazonaws.${var.region}.s3"
-  vpc_endpoint_type = "Gateway"
-  vpc_id = aws_vpc.api_vpc.id
-  route_table_ids = [aws_route_table.private_rt_az1.id]
-    tags = {
-    Name = "s3-gateway-endpoint"
   }
 
 }
