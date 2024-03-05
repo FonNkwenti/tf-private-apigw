@@ -24,6 +24,10 @@ variable "lambda_timeout" {
   type    = number
   default = 30
 }
+variable "claim_function_name" {
+  type    = string
+  default = "claimFunction"
+}
 variable "create_function_name" {
   type    = string
   default = "createClaim"

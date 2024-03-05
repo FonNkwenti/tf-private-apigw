@@ -38,6 +38,9 @@ resource "aws_iam_role_policy_attachment" "ddb_full_access" {
 ##################################
 # Create Lambda
 ##################################
+
+
+
 data "archive_file" "create_handler_zip" {
   type        = "zip"
   source_dir = "${path.module}/src/handlers/"
@@ -62,6 +65,7 @@ data "archive_file" "delete_handler_zip" {
   output_path = "${path.module}/src/files/delete.zip"
 
 }
+
 
 resource "aws_lambda_function" "createClaim" {
   filename      = data.archive_file.create_handler_zip.output_path
@@ -176,14 +180,17 @@ resource "aws_cloudwatch_log_group" "deleteClaim_lg" {
 }
 
 
-# resource "aws_lambda_permission" "apigw_create_permission" {
-#   statement_id  = "AllowExecutionFromAPIGateway"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.createClaim.function_name
-#   principal     = "apigateway.amazonaws.com"
 
-#   source_arn    = "${aws_api_gateway_rest_api.claims.execution_arn}/*"
-# }
+
+resource "aws_lambda_permission" "apigw_create_permission" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.createClaim.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn    = "${aws_api_gateway_rest_api.this.execution_arn}/*"
+}
+
 
 resource "aws_lambda_permission" "apigw_get_permission" {
   statement_id  = "AllowExecutionFromAPIGateway"
@@ -191,26 +198,26 @@ resource "aws_lambda_permission" "apigw_get_permission" {
   function_name = aws_lambda_function.getClaim.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn    = "${aws_api_gateway_rest_api.claims.execution_arn}/*"
+  source_arn    = "${aws_api_gateway_rest_api.this.execution_arn}/*"
 }
 
 
-# resource "aws_lambda_permission" "apigw_update_permission" {
-#   statement_id  = "AllowExecutionFromAPIGateway"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.updateClaim.function_name
-#   principal     = "apigateway.amazonaws.com"
+resource "aws_lambda_permission" "apigw_update_permission" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.updateClaim.function_name
+  principal     = "apigateway.amazonaws.com"
 
-#   source_arn    = "${aws_api_gateway_rest_api.claims.execution_arn}/*"
-# }
-# resource "aws_lambda_permission" "apigw_delete_permission" {
-#   statement_id  = "AllowExecutionFromAPIGateway"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.deleteClaim.function_name
-#   principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.this.execution_arn}/*"
+}
+resource "aws_lambda_permission" "apigw_delete_permission" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.deleteClaim.function_name
+  principal     = "apigateway.amazonaws.com"
 
-#   source_arn    = "${aws_api_gateway_rest_api.claims.execution_arn}/*"
-# }
+  source_arn    = "${aws_api_gateway_rest_api.this.execution_arn}/*"
+}
 
 
 

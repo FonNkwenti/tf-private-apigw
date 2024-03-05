@@ -129,6 +129,8 @@ resource "aws_route53_resolver_rule" "private_api_resolver_rule" {
   target_ip     {
     ip = "10.0.2.10"
   }
+
+  depends_on = [ aws_route53_resolver_endpoint.outbound_resolver_ep ]
   tags = {
     Name = "private-api-resolver-rule"
   }
