@@ -41,16 +41,16 @@ resource "aws_security_group" "api_client_sg" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    # cidr_blocks = ["${aws_subnet.private_sn_az1.cidr_block}"]
+    # cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${aws_subnet.private_sn_az1.cidr_block}"]
 
   }
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    # cidr_blocks = ["${aws_subnet.private_sn_az1.cidr_block}"]
+    # cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${aws_subnet.private_sn_az1.cidr_block}"]
 
   }
 
@@ -60,7 +60,7 @@ resource "aws_security_group" "api_client_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  # depends_on = [ aws_subnet.private_sn_az1 ]
+
 
   lifecycle {
     create_before_destroy = true
@@ -74,14 +74,6 @@ resource "aws_security_group" "execute_api_ep_sg" {
   ingress {
     from_port   = 443
     to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    # cidr_blocks = ["${aws_subnet.private_sn_az1.cidr_block}"]
-
-  }
-  ingress {
-    from_port   = 80
-    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     # cidr_blocks = ["${aws_subnet.private_sn_az1.cidr_block}"]
@@ -157,8 +149,8 @@ resource "aws_security_group" "private_lambda_sg" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    # cidr_blocks = ["${aws_subnet.private_sn_az1.cidr_block}"]
+    # cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${aws_subnet.private_sn_az1.cidr_block}", "${aws_subnet.private_sn_az2.cidr_block}"]
   }
 
   egress {

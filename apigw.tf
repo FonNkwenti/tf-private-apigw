@@ -7,12 +7,19 @@ resource "aws_api_gateway_rest_api" "this" {
   }
 }
 
-#create an API Gateway claim resource
-resource "aws_api_gateway_resource" "this" {
+# API Gateway claim resource
+resource "aws_api_gateway_resource" "claim" {
   rest_api_id = aws_api_gateway_rest_api.this.id
   parent_id   = aws_api_gateway_rest_api.this.root_resource_id
   path_part   = "claim"
 }
+# API Gateway resource for /claim/{id}
+resource "aws_api_gateway_resource" "claim_id" {
+  rest_api_id = aws_api_gateway_rest_api.this.id
+  parent_id   = aws_api_gateway_resource.claim.id
+  path_part   = "{id}"
+}
+
 
 # create an api gateway deployment
 resource "aws_api_gateway_deployment" "this" {
@@ -29,39 +36,46 @@ resource "aws_api_gateway_stage" "dev" {
   deployment_id = aws_api_gateway_deployment.this.id
   rest_api_id   = aws_api_gateway_rest_api.this.id
   stage_name    = "dev"
+    access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.claim.arn
+    format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId"
+  }
+  depends_on = [aws_api_gateway_account.this]
   
 }
 ## create a HTTP methods for the claim resource
 resource "aws_api_gateway_method" "post_claim" {
   rest_api_id   = aws_api_gateway_rest_api.this.id
-  resource_id   = aws_api_gateway_resource.this.id
+  resource_id   = aws_api_gateway_resource.claim.id
   http_method   = "POST"
   authorization = "NONE"
 }
 resource "aws_api_gateway_method" "get_claim" {
   rest_api_id   = aws_api_gateway_rest_api.this.id
-  resource_id   = aws_api_gateway_resource.this.id
+  resource_id   = aws_api_gateway_resource.claim_id.id
   http_method   = "GET"
   authorization = "NONE"
 }
+
+# create aws_api_gateway_method_settings
 resource "aws_api_gateway_method" "put_claim" {
   rest_api_id   = aws_api_gateway_rest_api.this.id
-  resource_id   = aws_api_gateway_resource.this.id
+  resource_id   = aws_api_gateway_resource.claim_id.id
   http_method   = "PUT"
   authorization = "NONE"
 }
 resource "aws_api_gateway_method" "delete_claim" {
   rest_api_id   = aws_api_gateway_rest_api.this.id
-  resource_id   = aws_api_gateway_resource.this.id
+  resource_id   = aws_api_gateway_resource.claim_id.id
   http_method   = "DELETE"
   authorization = "NONE"
 }
 
-##create an api gateway lambda proxy integration for the post_claim to the createclaim lambda function
+##api gateway lambda proxy integration for the post_claim to the createclaim lambda function
 
 resource "aws_api_gateway_integration" "post_claim_lambda" {
   rest_api_id = aws_api_gateway_rest_api.this.id
-  resource_id = aws_api_gateway_resource.this.id
+  resource_id = aws_api_gateway_resource.claim.id
   http_method = aws_api_gateway_method.post_claim.http_method
 
   integration_http_method = "POST"
@@ -70,7 +84,7 @@ resource "aws_api_gateway_integration" "post_claim_lambda" {
 }
 resource "aws_api_gateway_integration" "get_claim_lambda" {
   rest_api_id = aws_api_gateway_rest_api.this.id
-  resource_id = aws_api_gateway_resource.this.id
+  resource_id = aws_api_gateway_resource.claim_id.id
   http_method = aws_api_gateway_method.get_claim.http_method
 
   integration_http_method = "POST"
@@ -80,7 +94,7 @@ resource "aws_api_gateway_integration" "get_claim_lambda" {
 
 resource "aws_api_gateway_integration" "put_claim_lambda" {
   rest_api_id = aws_api_gateway_rest_api.this.id
-  resource_id = aws_api_gateway_resource.this.id
+  resource_id = aws_api_gateway_resource.claim_id.id
   http_method = aws_api_gateway_method.put_claim.http_method
 
   integration_http_method = "POST"
@@ -90,7 +104,7 @@ resource "aws_api_gateway_integration" "put_claim_lambda" {
 
 resource "aws_api_gateway_integration" "delete_claim_lambda" {
   rest_api_id = aws_api_gateway_rest_api.this.id
-  resource_id = aws_api_gateway_resource.this.id
+  resource_id = aws_api_gateway_resource.claim_id.id
   http_method = aws_api_gateway_method.delete_claim.http_method
 
   integration_http_method = "POST"
@@ -98,6 +112,34 @@ resource "aws_api_gateway_integration" "delete_claim_lambda" {
   uri                     = aws_lambda_function.deleteClaim.invoke_arn
 }
 
+resource "aws_cloudwatch_log_group" "claim" {
+  name              = "API-Gateway-Execution-Logs_${aws_api_gateway_rest_api.this.id}/dev"
+  retention_in_days = 7
+}
+resource "aws_api_gateway_account" "this" {
+  cloudwatch_role_arn = aws_iam_role.apigw_exec_role.arn
+}
+resource "aws_iam_role" "apigw_exec_role" {
+  name = "apigw-exec-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Sid    = ""
+      Principal = {
+        Service = "apigateway.amazonaws.com"
+      }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "apigw_cloudwatch" {
+  role = aws_iam_role.apigw_exec_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+  
+}
 
 
 

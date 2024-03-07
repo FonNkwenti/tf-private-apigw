@@ -28,6 +28,17 @@ resource "aws_subnet" "public_sn_az1" {
   }
 }
 
+resource "aws_ec2_subnet_cidr_reservation" "private_sn_az1_rsv" {
+  cidr_block       = "10.0.1.0/28"
+  reservation_type = "explicit"
+  subnet_id        = aws_subnet.private_sn_az1.id
+}
+resource "aws_ec2_subnet_cidr_reservation" "private_sn_az2_rsv" {
+  cidr_block       = "10.0.2.0/28"
+  reservation_type = "explicit"
+  subnet_id        = aws_subnet.private_sn_az2.id
+}
+
 
 resource "aws_route_table" "public_sn_rt" {
   vpc_id = aws_vpc.api_vpc.id
@@ -166,7 +177,7 @@ resource "aws_vpc_endpoint" "execute_api_ep" {
   vpc_id              = aws_vpc.api_vpc.id
   service_name        = "com.amazonaws.${var.region}.execute-api"
   security_group_ids  = [aws_security_group.execute_api_ep_sg.id]
-  subnet_ids          = [aws_subnet.private_sn_az1.id]
+  subnet_ids          = [aws_subnet.private_sn_az1.id, aws_subnet.private_sn_az2.id]
   tags = {
     Name = "execute-api-endpoint"
   }
@@ -228,7 +239,7 @@ resource "aws_vpc_endpoint" "ddb_ep" {
   service_name = "com.amazonaws.${var.region}.dynamodb"
   vpc_endpoint_type = "Gateway"
   vpc_id = aws_vpc.api_vpc.id
-  route_table_ids = [aws_route_table.private_rt_az1.id]
+  route_table_ids = [aws_route_table.private_rt_az1.id, aws_route_table.private_rt_az2.id]
     tags = {
     Name = "dynamodb-gateway-endpoint"
   }

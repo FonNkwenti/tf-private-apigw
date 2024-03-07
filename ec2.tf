@@ -67,7 +67,7 @@ resource "aws_instance" "api_vpc_instance" {
   ami                    = local.ami
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.private_sn_az1.id
-  vpc_security_group_ids = [ aws_security_group.execute_api_ep_sg.id, aws_security_group.ssh_sg.id]
+  vpc_security_group_ids = [ aws_security_group.execute_api_ep_sg.id]
   # key_name               = "default-euc1"
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
   # user_data_replace_on_change = true
@@ -77,4 +77,3 @@ resource "aws_instance" "api_vpc_instance" {
     Name = "api-vpc-instance"
   }
 }
-

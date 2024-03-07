@@ -44,25 +44,25 @@ resource "aws_iam_role_policy_attachment" "ddb_full_access" {
 data "archive_file" "create_handler_zip" {
   type        = "zip"
   source_dir = "${path.module}/src/handlers/"
-  output_path = "${path.module}/src/files/create.zip"
+  output_path = "${path.module}/src/archives/create.zip"
 
 }
 data "archive_file" "get_handler_zip" {
   type        = "zip"
   source_dir = "${path.module}/src/handlers/"
-  output_path = "${path.module}/src/files/get.zip"
+  output_path = "${path.module}/src/archives/get.zip"
 
 }
 data "archive_file" "update_handler_zip" {
   type        = "zip"
   source_dir = "${path.module}/src/handlers/"
-  output_path = "${path.module}/src/files/update.zip"
+  output_path = "${path.module}/src/archives/update.zip"
 
 }
 data "archive_file" "delete_handler_zip" {
   type        = "zip"
   source_dir = "${path.module}/src/handlers/"
-  output_path = "${path.module}/src/files/delete.zip"
+  output_path = "${path.module}/src/archives/delete.zip"
 
 }
 
@@ -162,19 +162,19 @@ resource "aws_lambda_function" "deleteClaim" {
 
 
 # create log group for create function
-resource "aws_cloudwatch_log_group" "createClaim_lg" {
+resource "aws_cloudwatch_log_group" "createClaim" {
   name              = "/aws/lambda/${aws_lambda_function.createClaim.function_name}"
   retention_in_days = 14
 }
-resource "aws_cloudwatch_log_group" "getClaim_lg" {
+resource "aws_cloudwatch_log_group" "getClaim" {
   name              = "/aws/lambda/${aws_lambda_function.getClaim.function_name}"
   retention_in_days = 14
 }
-resource "aws_cloudwatch_log_group" "updateClaim_lg" {
+resource "aws_cloudwatch_log_group" "updateClaim" {
   name              = "/aws/lambda/${aws_lambda_function.updateClaim.function_name}"
   retention_in_days = 14
 }
-resource "aws_cloudwatch_log_group" "deleteClaim_lg" {
+resource "aws_cloudwatch_log_group" "deleteClaim" {
   name              = "/aws/lambda/${aws_lambda_function.deleteClaim.function_name}"
   retention_in_days = 14
 }
