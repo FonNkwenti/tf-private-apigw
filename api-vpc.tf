@@ -205,7 +205,7 @@ resource "aws_vpc_endpoint_policy" "execute_api_ep_policy" {
 
 
 #####################################
-# create a vpc endpoint for the SSM Manager private access
+# vpc endpoint for the SSM Manager private access to api-vpc
 #####################################
 resource "aws_vpc_endpoint" "ssm2_ep" {
   vpc_endpoint_type   = "Interface"

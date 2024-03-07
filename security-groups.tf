@@ -34,7 +34,6 @@ resource "aws_security_group" "execute_api_ep_sg" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    # cidr_blocks = ["0.0.0.0/0"]
     cidr_blocks = ["${aws_subnet.private_sn_az1.cidr_block}", "${aws_subnet.private_sn_az2.cidr_block}", "${aws_subnet.client_private_sn_az1.cidr_block}", "${aws_subnet.client_private_sn_az2.cidr_block}"]
 
   }

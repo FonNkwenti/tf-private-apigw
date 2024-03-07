@@ -1,33 +1,17 @@
-api/
-  |- api_gateway.tf
-  |- dynamodb.tf
-  |- lambda/
-      |- handlers/
-          |- create_handler.js
-          |- read_handler.js
-          |- update_handler.js
-          |- delete_handler.js
-      |- libs/        # Reusable components/modules
-      |- models/     # Data models if needed
-      |- utils/       # Utility functions
-      |- seeds/       # Seeder functions for testing/initialization
-      |- package.json # Project dependencies and scripts
-      |- main.js      # Entry point for Lambda function (optional)
-      |- tests/       # Unit tests for Lambda handlers (optional)
-  |- main.tf
-  |- outputs.tf
-  |- README.md
-
-terraform/
-  |- variables.tf
-  |- outputs.tf
-  |- ...
-
-tools/
-  |- scripts/
-  |- utils/
-  |- ...
-
-package.json files:
-  - `api/lambda/package.json` for each Lambda function directory
-  - `api/package.json` (optional) for shared dependencies across Lambda functions
+|- src/
+	|- archives/
+	|- handlers/
+		|- libs/
+			|- ddbDocClient.mjs
+		|- create.mjs
+		|- get.mjs
+		|- update.mjs
+		|- delete.mjs
+|- locals.tf
+|- provider.tf
+|- terraform.tfvars.tf
+|- variables.tf
+|- api-vpc.tf
+|- lambda.tf
+|- security-groups.tf
+|- apigw.tf
