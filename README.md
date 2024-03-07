@@ -63,7 +63,7 @@ Before you begin, ensure you have the following:
    ```bash
    terraform apply
    ```
-7. Adter the apply is complete, Terraform will output the private API Gateway URL which can be used to access the private Serverless REST API
+7. After the apply is complete, Terraform will output the private API Gateway URL which can be used to access the private Serverless REST API
 
 ## License
 
