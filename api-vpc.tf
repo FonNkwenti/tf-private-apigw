@@ -126,7 +126,7 @@ resource "aws_route_table_association" "private_rta_az2" {
 # create a vpc peering connection
 resource "aws_vpc_peering_connection" "api_client_vpc_peering" {
   vpc_id        = aws_vpc.api_vpc.id
-  peer_vpc_id   = aws_vpc.api_client_vpc.id
+  peer_vpc_id   = aws_vpc.client_vpc.id
   auto_accept   = true
   accepter {
     allow_remote_vpc_dns_resolution = true

@@ -34,25 +34,10 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   role = aws_iam_role.ec2_exec_role.name
 }
 
-
-
-# resource "aws_instance" "jumphost" {
-#   ami                    = data.aws_ami.amazon_linux_2.id
-#   instance_type          = "t2.micro"
-#   subnet_id              = aws_subnet.public_sn_az1.id
-#   vpc_security_group_ids = [aws_security_group.ssh_sg.id, aws_security_group.execute_api_ep_sg.id]
-#   key_name               = "default-euc1"
-#   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
-#   user_data_replace_on_change = true
-#   user_data = base64encode(file("userdata.sh")) 
-#   tags = {
-#     Name = "jumphost"
-#   }
-# }
 resource "aws_instance" "client_vpc_instance" {
   ami                    = local.ami // 
   instance_type          = "t2.micro"
-  subnet_id              = aws_subnet.api_client_pri_sn_az1.id
+  subnet_id              = aws_subnet.client_private_sn_az1.id
   vpc_security_group_ids = [aws_security_group.api_client_sg.id, ]
   key_name               = "default-euc1"
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
@@ -68,10 +53,7 @@ resource "aws_instance" "api_vpc_instance" {
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.private_sn_az1.id
   vpc_security_group_ids = [ aws_security_group.execute_api_ep_sg.id]
-  # key_name               = "default-euc1"
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
-  # user_data_replace_on_change = true
-  # user_data = base64encode(file("userdata.sh")) 
 
   tags = {
     Name = "api-vpc-instance"

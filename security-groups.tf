@@ -35,7 +35,7 @@ resource "aws_security_group" "ssh_sg" {
 resource "aws_security_group" "api_client_sg" {
   name        = "api-client-sg"
   description = "Security group for API clients"
-  vpc_id      = aws_vpc.api_client_vpc.id
+  vpc_id      = aws_vpc.client_vpc.id
 
   ingress {
     from_port   = 443
@@ -119,7 +119,7 @@ resource "aws_security_group" "ssm2_ep_sg" {
 resource "aws_security_group" "ssm_ep_sg" {
   name        = "ssm-endpoint-sg"
   description = "Security group for SSM endpoints"
-  vpc_id      = aws_vpc.api_client_vpc.id
+  vpc_id      = aws_vpc.client_vpc.id
 
   ingress {
     from_port   = 443
@@ -206,7 +206,7 @@ resource "aws_security_group" "inbound_resolver_ep_sg" {
 resource "aws_security_group" "outbound_resolver_ep_sg" {
   name        = "private-api-outbound-resolver-endpoint-sg"
   description = "Security group for Route 53 outbound endpoints"
-  vpc_id      = aws_vpc.api_client_vpc.id
+  vpc_id      = aws_vpc.client_vpc.id
 
   ingress {
     from_port   = 53

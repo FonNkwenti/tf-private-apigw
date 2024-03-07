@@ -1,4 +1,4 @@
-resource "aws_vpc" "api_client_vpc" {
+resource "aws_vpc" "client_vpc" {
     cidr_block = "172.128.0.0/16"
     enable_dns_hostnames = true
     enable_dns_support = true
@@ -9,20 +9,20 @@ resource "aws_vpc" "api_client_vpc" {
 }
 
 
-resource "aws_subnet" "api_client_pri_sn_az1" {
-    vpc_id                 = aws_vpc.api_client_vpc.id
+resource "aws_subnet" "client_private_sn_az1" {
+    vpc_id                 = aws_vpc.client_vpc.id
     cidr_block             = "172.128.1.0/24"
     availability_zone = data.aws_availability_zones.available.names[0]
     map_public_ip_on_launch = false
 
     tags = {
-        Name = "api-client-subnet-az1"
+        Name = "client-private-subnet-az1"
     }
   
 }
 
-resource "aws_route_table" "api_client_rt_az1" {
-    vpc_id = aws_vpc.api_client_vpc.id
+resource "aws_route_table" "client_private_rt_az1" {
+    vpc_id = aws_vpc.client_vpc.id
 
     route {
         cidr_block = "10.0.0.0/16"
@@ -30,27 +30,27 @@ resource "aws_route_table" "api_client_rt_az1" {
     }
 
     tags = {
-        Name = "api-client-rt-az1"
+        Name = "client-private-rt-az1"
     }
   
 }
 
 # create private aws subnet for az2
-resource "aws_subnet" "api_client_pri_sn_az2" {
-    vpc_id                 = aws_vpc.api_client_vpc.id
+resource "aws_subnet" "client_private_sn_az2" {
+    vpc_id                 = aws_vpc.client_vpc.id
     cidr_block             = "172.128.2.0/24"
     availability_zone = data.aws_availability_zones.available.names[1]
     map_public_ip_on_launch = false
 
     tags = {
-        Name = "api-client-subnet-az2"
+        Name = "client-private-subnet-az2"
     }
   
 }
 
 # create route table for private subnet az2
-resource "aws_route_table" "api_client_rt_az2" {
-    vpc_id = aws_vpc.api_client_vpc.id
+resource "aws_route_table" "client_private_rt_az2" {
+    vpc_id = aws_vpc.client_vpc.id
 
     route {
         cidr_block = "10.0.0.0/16"
@@ -58,20 +58,20 @@ resource "aws_route_table" "api_client_rt_az2" {
     }
 
     tags = {
-        Name = "api-client-rt-az2"
+        Name = "client-private-rt-az2"
     }
   
 }
 
 # create route table association for private subnet az2
-resource "aws_route_table_association" "api_client_rta2_az2" {
-    subnet_id = aws_subnet.api_client_pri_sn_az2.id
-    route_table_id = aws_route_table.api_client_rt_az2.id
+resource "aws_route_table_association" "client_rta2_az2" {
+    subnet_id = aws_subnet.client_private_sn_az2.id
+    route_table_id = aws_route_table.client_private_rt_az2.id
 }
 # create route table association
-resource "aws_route_table_association" "api_client_rta1_az1" {
-    subnet_id = aws_subnet.api_client_pri_sn_az1.id
-    route_table_id = aws_route_table.api_client_rt_az1.id
+resource "aws_route_table_association" "client_rta1_az1" {
+    subnet_id = aws_subnet.client_private_sn_az1.id
+    route_table_id = aws_route_table.client_private_rt_az1.id
 }
 
 # create a VPC peering connection accepter
@@ -98,12 +98,12 @@ resource "aws_route53_resolver_endpoint" "outbound_resolver_ep" {
   security_group_ids = [aws_security_group.outbound_resolver_ep_sg.id]
 
   ip_address {
-    subnet_id = aws_subnet.api_client_pri_sn_az1.id
+    subnet_id = aws_subnet.client_private_sn_az1.id
     ip        = "172.128.1.10"
   }
 
   ip_address {
-    subnet_id = aws_subnet.api_client_pri_sn_az2.id
+    subnet_id = aws_subnet.client_private_sn_az2.id
     ip        = "172.128.2.10"
   }
 
@@ -139,7 +139,7 @@ resource "aws_route53_resolver_rule" "private_api_resolver_rule" {
 # create route53 resolver rule association with client_vpc
 resource "aws_route53_resolver_rule_association" "private_api_resolver_rule_assoc" {
   resolver_rule_id = aws_route53_resolver_rule.private_api_resolver_rule.id
-  vpc_id = aws_vpc.api_client_vpc.id
+  vpc_id = aws_vpc.client_vpc.id
 }
 #*/
 
@@ -151,8 +151,8 @@ resource "aws_vpc_endpoint" "ssm_ep" {
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   service_name        = "com.amazonaws.${var.region}.ssm"
-  vpc_id              = aws_vpc.api_client_vpc.id
-  subnet_ids          = [aws_subnet.api_client_pri_sn_az1.id]
+  vpc_id              = aws_vpc.client_vpc.id
+  subnet_ids          = [aws_subnet.client_private_sn_az1.id]
   security_group_ids  = [aws_security_group.ssm_ep_sg.id]
   tags = {
     Name = "ssm-endpoint"
@@ -162,43 +162,10 @@ resource "aws_vpc_endpoint" "ssm_messages_ep" {
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   service_name        = "com.amazonaws.${var.region}.ssmmessages"
-  vpc_id              = aws_vpc.api_client_vpc.id
-  subnet_ids          = [aws_subnet.api_client_pri_sn_az1.id]
+  vpc_id              = aws_vpc.client_vpc.id
+  subnet_ids          = [aws_subnet.client_private_sn_az1.id]
   security_group_ids  = [aws_security_group.ssm_ep_sg.id]
   tags = {
     Name = "ssm-messages-endpoint"
   }
 }
-
-
-/*
-###########################################
-# private zone for private API as an alternative to using inbound and outbound Route53 resolvers
-###########################################
-resource "aws_route53_zone" "private_api_zone" {
-  name = "${aws_api_gateway_rest_api.claims.id}.execute-api.${var.region}.amazonaws.com"
-#   name = "execute-api.eu-central-1.amazonaws.com"
-  vpc {
-    vpc_id = aws_vpc.api_client_vpc.id
-  }
-
-  tags = {
-    Name = "Private API Zone"
-  }
-}
-
-resource "aws_route53_record" "api_gateway_endpoint_record" {
-  zone_id = aws_route53_zone.private_api_zone.zone_id
-  name    = ""        
-  type    = "A"
-#   records = 
-
-  alias {
-    name                   = aws_vpc_endpoint.execute_api_ep.dns_entry[0].dns_name
-    zone_id                = aws_vpc_endpoint.execute_api_ep.dns_entry[0].hosted_zone_id
-    evaluate_target_health = false   
- 
-  }
-}
-
-*/

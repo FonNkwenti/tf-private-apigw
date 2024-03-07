@@ -1,6 +1,6 @@
 'use strict'
 
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { GetCommand } from "@aws-sdk/lib-dynamodb";
 import { ddbDocClient } from "./libs/ddbDocClient.mjs";
 import { randomUUID } from "crypto";
 
@@ -11,7 +11,7 @@ export const handler = async (event, context) => {
     console.log("event===",JSON.stringify(event, null, 2))
     return {
         statusCode: 200,
-        body: JSON.stringify({ message: "Hello World from get function" }),
+        body: JSON.stringify({ message: "Hello World from getClaim function" }),
     };
 
 }
