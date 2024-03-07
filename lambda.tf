@@ -1,5 +1,5 @@
 ###############################
-# execution role for lambdas
+# execution role for lambda
 ###############################
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda-exec-role"
@@ -35,12 +35,10 @@ resource "aws_iam_role_policy_attachment" "ddb_full_access" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
 }
 
+
 ##################################
-# Create Lambda
+# Lambda Infrastructure
 ##################################
-
-
-
 data "archive_file" "create_handler_zip" {
   type        = "zip"
   source_dir = "${path.module}/src/handlers/"
@@ -161,7 +159,7 @@ resource "aws_lambda_function" "deleteClaim" {
 }
 
 
-# create log group for create function
+#  log groups for CRUD functions
 resource "aws_cloudwatch_log_group" "createClaim" {
   name              = "/aws/lambda/${aws_lambda_function.createClaim.function_name}"
   retention_in_days = 14
@@ -181,6 +179,7 @@ resource "aws_cloudwatch_log_group" "deleteClaim" {
 
 
 
+# API Gateway Invoke Lambda permissions
 
 resource "aws_lambda_permission" "apigw_create_permission" {
   statement_id  = "AllowExecutionFromAPIGateway"

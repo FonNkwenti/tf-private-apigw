@@ -1,4 +1,4 @@
-# role for EC2 exec role
+# EC2 exec role
 resource "aws_iam_role" "ec2_exec_role" {
   name = "ec2-exec-role"
 
@@ -48,6 +48,8 @@ resource "aws_instance" "client_vpc_instance" {
     Name = "client-vpc-instance"
   }
 }
+
+# instance in the api-vpc required in part 1 to test the private API within the same VPC
 resource "aws_instance" "api_vpc_instance" {
   ami                    = local.ami
   instance_type          = "t2.micro"

@@ -16,8 +16,6 @@ resource "aws_internet_gateway" "api_vpc_igw" {
 
 }
 
-# data "aws_availability_zones" "available" {}
-
 resource "aws_subnet" "public_sn_az1" {
   vpc_id                  = aws_vpc.api_vpc.id
   cidr_block              = "10.0.0.0/24"
@@ -81,14 +79,14 @@ resource "aws_route_table" "private_rt_az1" {
   }
 }
 
-#  create a route table associate between private_rt_az1 private_route_1 and private_sn_az1
+#  route table association between private_rt_az1 private_route_1 and private_sn_az1
 resource "aws_route_table_association" "private_rta1_az1" {
   subnet_id      = aws_subnet.private_sn_az1.id
   route_table_id = aws_route_table.private_rt_az1.id
 }
 
 
-# create private subnet for az2
+# private subnet for az2
 resource "aws_subnet" "private_sn_az2" {
   vpc_id                  = aws_vpc.api_vpc.id
   cidr_block              = "10.0.2.0/24"
@@ -99,7 +97,7 @@ resource "aws_subnet" "private_sn_az2" {
   }
 }
 
-# create route table for private subnet az2
+#  route table for private subnet az2
 resource "aws_route_table" "private_rt_az2" {
   vpc_id = aws_vpc.api_vpc.id
 
@@ -112,7 +110,7 @@ resource "aws_route_table" "private_rt_az2" {
   }
 }
 
-# create route table associate for private subnet az2
+#  route table association for private subnet az2
 resource "aws_route_table_association" "private_rta_az2" {
   subnet_id      = aws_subnet.private_sn_az2.id
   route_table_id = aws_route_table.private_rt_az2.id
@@ -123,7 +121,7 @@ resource "aws_route_table_association" "private_rta_az2" {
 #########################################
 # VPC Peering with client VPC
 #########################################
-# create a vpc peering connection
+
 resource "aws_vpc_peering_connection" "api_client_vpc_peering" {
   vpc_id        = aws_vpc.api_vpc.id
   peer_vpc_id   = aws_vpc.client_vpc.id
@@ -145,7 +143,7 @@ resource "aws_vpc_peering_connection" "api_client_vpc_peering" {
 # DNS resolution for private api endpoint
 ###########################################
 
-# create route53 inbound resolver endpoint
+# route53 inbound resolver endpoint
 resource "aws_route53_resolver_endpoint" "inbound_resolver_ep" {
   name = "private-api-inbound-resolver-endpoint"
   direction      = "INBOUND"
@@ -170,7 +168,7 @@ resource "aws_route53_resolver_endpoint" "inbound_resolver_ep" {
 # VPC Endpoint for private API
 ##################################
 
-# create a vpc endpoint for the execute-api
+# vpc endpoint for the execute-api
 resource "aws_vpc_endpoint" "execute_api_ep" {
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true

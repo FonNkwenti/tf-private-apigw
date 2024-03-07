@@ -21,7 +21,7 @@ resource "aws_api_gateway_resource" "claim_id" {
 }
 
 
-# create an api gateway deployment
+#  api gateway deployment
 resource "aws_api_gateway_deployment" "this" {
   rest_api_id = aws_api_gateway_rest_api.this.id
 
@@ -31,7 +31,7 @@ resource "aws_api_gateway_deployment" "this" {
 
 }
 
-# create an api gateway stage for dev
+# api gateway stage for dev
 resource "aws_api_gateway_stage" "dev" {
   deployment_id = aws_api_gateway_deployment.this.id
   rest_api_id   = aws_api_gateway_rest_api.this.id
@@ -43,7 +43,7 @@ resource "aws_api_gateway_stage" "dev" {
   depends_on = [aws_api_gateway_account.this]
   
 }
-## create a HTTP methods for the claim resource
+## HTTP methods for the claim and claim_id resources
 resource "aws_api_gateway_method" "post_claim" {
   rest_api_id   = aws_api_gateway_rest_api.this.id
   resource_id   = aws_api_gateway_resource.claim.id
@@ -57,7 +57,6 @@ resource "aws_api_gateway_method" "get_claim" {
   authorization = "NONE"
 }
 
-# create aws_api_gateway_method_settings
 resource "aws_api_gateway_method" "put_claim" {
   rest_api_id   = aws_api_gateway_rest_api.this.id
   resource_id   = aws_api_gateway_resource.claim_id.id
@@ -71,7 +70,7 @@ resource "aws_api_gateway_method" "delete_claim" {
   authorization = "NONE"
 }
 
-##api gateway lambda proxy integration for the post_claim to the createclaim lambda function
+## api gateway lambda proxy integrations 
 
 resource "aws_api_gateway_integration" "post_claim_lambda" {
   rest_api_id = aws_api_gateway_rest_api.this.id
@@ -112,6 +111,7 @@ resource "aws_api_gateway_integration" "delete_claim_lambda" {
   uri                     = aws_lambda_function.deleteClaim.invoke_arn
 }
 
+# cloudwatch log group for API Gateway logs 
 resource "aws_cloudwatch_log_group" "claim" {
   name              = "API-Gateway-Execution-Logs_${aws_api_gateway_rest_api.this.id}/dev"
   retention_in_days = 7
@@ -142,7 +142,7 @@ resource "aws_iam_role_policy_attachment" "apigw_cloudwatch" {
 }
 
 
-
+# Mandatory apigw resource policy for private APIs
 resource "aws_api_gateway_rest_api_policy" "claim_policy" {
   rest_api_id = aws_api_gateway_rest_api.this.id
   policy      = jsonencode({

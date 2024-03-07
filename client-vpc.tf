@@ -35,7 +35,6 @@ resource "aws_route_table" "client_private_rt_az1" {
   
 }
 
-# create private aws subnet for az2
 resource "aws_subnet" "client_private_sn_az2" {
     vpc_id                 = aws_vpc.client_vpc.id
     cidr_block             = "172.128.2.0/24"
@@ -48,7 +47,7 @@ resource "aws_subnet" "client_private_sn_az2" {
   
 }
 
-# create route table for private subnet az2
+#  route table for private subnet az2
 resource "aws_route_table" "client_private_rt_az2" {
     vpc_id = aws_vpc.client_vpc.id
 
@@ -63,18 +62,19 @@ resource "aws_route_table" "client_private_rt_az2" {
   
 }
 
-# create route table association for private subnet az2
+#  route table associations for private subnets
 resource "aws_route_table_association" "client_rta2_az2" {
     subnet_id = aws_subnet.client_private_sn_az2.id
     route_table_id = aws_route_table.client_private_rt_az2.id
 }
-# create route table association
 resource "aws_route_table_association" "client_rta1_az1" {
     subnet_id = aws_subnet.client_private_sn_az1.id
     route_table_id = aws_route_table.client_private_rt_az1.id
 }
 
-# create a VPC peering connection accepter
+###########################################
+# VPC peering connection accepter
+###########################################
 resource "aws_vpc_peering_connection_accepter" "api_client_vpc_peering" {
   vpc_peering_connection_id = aws_vpc_peering_connection.api_client_vpc_peering.id
   auto_accept               = true
@@ -86,7 +86,7 @@ resource "aws_vpc_peering_connection_accepter" "api_client_vpc_peering" {
 }
 
 
-#/*
+
 ###########################################
 # DNS resolution for private api endpoint
 ###########################################
@@ -113,7 +113,7 @@ resource "aws_route53_resolver_endpoint" "outbound_resolver_ep" {
 }
 
 
-# create route53 resolver rule
+#  route53 resolver rule our outbound resolver
 resource "aws_route53_resolver_rule" "private_api_resolver_rule" {
   name        = "private-api-resolver-rule"
   domain_name = var.private_api_domain_name
@@ -136,12 +136,12 @@ resource "aws_route53_resolver_rule" "private_api_resolver_rule" {
   }
 }
 
-# create route53 resolver rule association with client_vpc
+# route53 resolver rule association with client_vpc
 resource "aws_route53_resolver_rule_association" "private_api_resolver_rule_assoc" {
   resolver_rule_id = aws_route53_resolver_rule.private_api_resolver_rule.id
   vpc_id = aws_vpc.client_vpc.id
 }
-#*/
+
 
 
 ###########################################
