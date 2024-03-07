@@ -35,7 +35,7 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 }
 
 resource "aws_instance" "client_vpc_instance" {
-  ami                    = local.ami // 
+  ami                    = local.ami 
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.client_private_sn_az1.id
   vpc_security_group_ids = [aws_security_group.api_client_sg.id, ]

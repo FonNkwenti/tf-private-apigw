@@ -9,7 +9,7 @@ Before you begin, ensure you have the following:
 - AWS CLI installed and configured with appropriate access credentials
 
 ## Architecture
-
+![](private-rest-api-part2-white.webp)
 
 
 ## Project Structure
@@ -53,6 +53,11 @@ Before you begin, ensure you have the following:
    ```
 4. Review and modify `variables.tf` to customize your API configurations.
 5. Create a `terraform.tfvars` file in the root directory and pass in values for `region`, `account_id`, `tag_environment` and `tag_project`
+6. Apply the Terraform configure:
+   ```basg
+   terraform apply
+   ```
+7. Adter the apply is complete, Terraform will output the private API Gateway URL which can be used to access the private Serverless REST API
 
 ## License
 
