@@ -1,5 +1,6 @@
 |- src/
 	|- archives/
+  |- events/
 	|- handlers/
 		|- libs/
 			|- ddbDocClient.mjs
@@ -15,3 +16,5 @@
 |- lambda.tf
 |- security-groups.tf
 |- apigw.tf
+|- ec2.tf
+|- client-vpc.tf
