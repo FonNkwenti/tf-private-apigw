@@ -41,8 +41,6 @@ resource "aws_instance" "client_vpc_instance" {
   vpc_security_group_ids = [aws_security_group.api_client_sg.id, ]
   key_name               = "default-euc1"
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
-  user_data_replace_on_change = true
-  user_data = base64encode(file("userdata.sh")) 
 
   tags = {
     Name = "client-vpc-instance"

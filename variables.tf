@@ -34,15 +34,15 @@ variable "create_function_name" {
 }
 variable "get_function_name" {
   type    = string
-  default = "get"
+  default = "getClaim"
 }
 variable "update_function_name" {
   type    = string
-  default = "update"
+  default = "updateClaim"
 }
 variable "delete_function_name" {
   type    = string
-  default = "delete"
+  default = "deleteClaim"
 }
 
 variable "private_api_domain_name" {
