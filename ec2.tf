@@ -39,7 +39,6 @@ resource "aws_instance" "client_vpc_instance" {
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.client_private_sn_az1.id
   vpc_security_group_ids = [aws_security_group.api_client_sg.id, ]
-  key_name               = "default-euc1"
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
 
   tags = {
