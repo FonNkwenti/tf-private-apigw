@@ -38,7 +38,7 @@ resource "aws_route_table" "client_private_rt_az1" {
 resource "aws_subnet" "client_private_sn_az2" {
     vpc_id                 = aws_vpc.client_vpc.id
     cidr_block             = "172.128.2.0/24"
-    availability_zone = data.aws_availability_zones.available.names[1]
+    availability_zone = data.aws_availability_zones.available.names[0]
     map_public_ip_on_launch = false
 
     tags = {

@@ -8,14 +8,6 @@ resource "aws_vpc" "api_vpc" {
 
 }
 
-resource "aws_internet_gateway" "api_vpc_igw" {
-  vpc_id = aws_vpc.api_vpc.id
-  tags = {
-    Name = "api-vpc-igw"
-  }
-
-}
-
 resource "aws_subnet" "public_sn_az1" {
   vpc_id                  = aws_vpc.api_vpc.id
   cidr_block              = "10.0.0.0/24"
@@ -35,25 +27,6 @@ resource "aws_ec2_subnet_cidr_reservation" "private_sn_az2_rsv" {
   cidr_block       = "10.0.2.0/28"
   reservation_type = "explicit"
   subnet_id        = aws_subnet.private_sn_az2.id
-}
-
-
-resource "aws_route_table" "public_sn_rt" {
-  vpc_id = aws_vpc.api_vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.api_vpc_igw.id
-  }
-  tags = {
-    Name = "Public Route Table"
-  }
-}
-
-resource "aws_route_table_association" "public_rta_az1" {
-  subnet_id      = aws_subnet.public_sn_az1.id
-  route_table_id = aws_route_table.public_sn_rt.id
-
 }
 
 

@@ -11,6 +11,7 @@ Before you begin, ensure you have the following:
 ## Architecture
 ![Diagram](private-rest-api-part2-white.webp)
 
+---
 
 ## Project Structure
 ```bash
@@ -35,7 +36,7 @@ Before you begin, ensure you have the following:
 |- ec2.tf
 |- client-vpc.tf
 ```
-
+---
 ## Getting Started
 
 1. Clone this repository:
@@ -64,6 +65,14 @@ Before you begin, ensure you have the following:
    terraform apply
    ```
 7. After the apply is complete, Terraform will output the private API Gateway URL which can be used to access the private Serverless REST API
+
+---
+
+## Tutorials
+[Private Serverless REST API with API Gateway: Lambda, DynamoDB, VPC Endpoints & Terraform - Part 1]()
+
+[Private Serverless REST API with API Gateway: Lambda, DynamoDB, VPC Endpoints & Terraform - Part 2]()
+
 
 ## License
 
