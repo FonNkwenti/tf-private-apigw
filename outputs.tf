@@ -20,3 +20,7 @@ output "execute_api_arn" {
 output "api_instance_private_ip" {
     value = aws_instance.api_vpc_instance.private_ip
 }
+
+output "ddb_endpoint_id" {
+    value = aws_vpc_endpoint.ddb_ep.id
+}
